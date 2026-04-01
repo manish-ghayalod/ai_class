@@ -807,3 +807,31 @@ html, body {
   min-height: 0;
   overflow-y: auto;
 }
+
+/* ─── Critical: hidden must override all display rules ──────────────────── */
+.hidden { display: none !important; }
+
+/* When poolChatActive is NOT hidden, show as flex */
+#poolChatActive:not(.hidden) {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 8px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Remove the conflicting rule */
+#poolChatActive {
+  min-height: 0;
+}
+
+/* ─── Force characteristics to scroll properly ──────────────────────────── */
+.pool-characteristics {
+  max-height: 240px !important;
+}
+
+.pool-characteristics .extract-result {
+  overflow-y: auto !important;
+  max-height: 180px;
+}
