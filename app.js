@@ -227,11 +227,10 @@ function resetToUpload() {
 }
 
 function resetAnalysis() {
-  // Keep the characteristics visible, just reset the chat
   poolChatHistory = [];
   poolChatWindow.innerHTML = '';
-  poolChatActive.classList.add('pool-section--hidden');
-  poolChatPrompt.classList.remove('pool-section--hidden');
+  poolChatActive.classList.add('hidden');
+  poolChatPrompt.classList.remove('hidden');
 }
 
 async function handlePdfUpload(file) {
@@ -355,8 +354,8 @@ function renderExtractedData(d) {
 
 askWilePoolBtn.addEventListener('click', () => {
   if (!extractedPoolData) return;
-  poolChatPrompt.classList.add('pool-section--hidden');
-  poolChatActive.classList.remove('pool-section--hidden');
+  poolChatPrompt.classList.add('hidden');
+  poolChatActive.classList.remove('hidden');
   startPoolAnalysis();
 });
 
