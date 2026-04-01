@@ -469,3 +469,204 @@ html, body {
   color: #6db86d;
   margin-top: 6px;
 }
+
+/* ─── Tab Bar ───────────────────────────────────────────────────────────── */
+
+.tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--bg-panel);
+}
+
+.tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 11px 8px;
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.tab-btn:hover { color: var(--text-secondary); }
+
+.tab-btn--active {
+  color: var(--mit-red);
+  border-bottom-color: var(--mit-red);
+}
+
+/* ─── Tab Content ───────────────────────────────────────────────────────── */
+
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.tab-content--hidden { display: none; }
+
+/* ─── Pool Sections ─────────────────────────────────────────────────────── */
+
+.pool-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  padding: 16px 20px;
+  gap: 10px;
+}
+
+.pool-section--hidden { display: none; }
+
+.pool-section__label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* ─── Upload Zone ───────────────────────────────────────────────────────── */
+
+.upload-zone {
+  border: 2px dashed var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+  flex-shrink: 0;
+}
+
+.upload-zone:hover,
+.upload-zone--drag {
+  border-color: var(--mit-red);
+  background: var(--mit-red-glow);
+}
+
+.upload-zone__icon { font-size: 32px; margin-bottom: 10px; }
+
+.upload-zone__text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.upload-zone__hint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.upload-status {
+  font-size: 12px;
+  min-height: 18px;
+  text-align: center;
+}
+
+.upload-status--loading { color: var(--mit-light-gray); }
+.upload-status--error   { color: #f5a0a9; }
+
+/* ─── Extracted Data ────────────────────────────────────────────────────── */
+
+.extract-result {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+}
+
+.extract-result::-webkit-scrollbar { width: 4px; }
+.extract-result::-webkit-scrollbar-track { background: transparent; }
+.extract-result::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.extract-deal-name {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.extract-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 10px;
+  margin-bottom: 10px;
+}
+
+.extract-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.extract-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.extract-value {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.extract-risks {
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.extract-risks p {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+.extract-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+/* ─── Pool Chat ─────────────────────────────────────────────────────────── */
+
+.chat-window--pool {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+}
+
+.chat-window--pool::-webkit-scrollbar { width: 4px; }
+.chat-window--pool::-webkit-scrollbar-track { background: transparent; }
+.chat-window--pool::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+#poolChatSection .chat-input-area {
+  padding: 0;
+  border-top: none;
+  flex-shrink: 0;
+}

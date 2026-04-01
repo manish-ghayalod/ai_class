@@ -47,6 +47,7 @@
         <p class="panel__subtitle">Powered by institutional memory</p>
       </div>
 
+      <!-- API Key -->
       <div class="api-key-section" id="apiKeySection">
         <label class="field-label" for="apiKeyInput">Anthropic API Key</label>
         <div class="api-key-row">
@@ -56,23 +57,87 @@
         <p class="field-hint">Key is stored in memory only and never sent anywhere except Anthropic.</p>
       </div>
 
-      <div class="chat-window" id="chatWindow">
-        <div class="chat-message chat-message--system">
-          <p>This is Wile Coyote's AI persona. Ask about past decisions, deal assumptions, or analytical framework. Answers are grounded in his email history.</p>
+      <!-- Tab Switcher -->
+      <div class="tab-bar">
+        <button class="tab-btn tab-btn--active" id="tabHistorical" onclick="switchTab('historical')">
+          Historical Lookup
+        </button>
+        <button class="tab-btn" id="tabNewPool" onclick="switchTab('newpool')">
+          New Pool Analysis
+        </button>
+      </div>
+
+      <!-- TAB 1: Historical Lookup (chat) -->
+      <div class="tab-content" id="tabContentHistorical">
+        <div class="chat-window" id="chatWindow">
+          <div class="chat-message chat-message--system">
+            <div class="chat-message__bubble">
+              Ask Wile about past decisions, deal assumptions, or his analytical framework. Answers are grounded in his email archive.
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-input-area">
+          <textarea
+            id="chatInput"
+            placeholder="e.g. Why did Wile set the CDR at 3.2% for Sunrise Mortgage Trust 2021-3?"
+            rows="3"
+          ></textarea>
+          <div class="chat-actions">
+            <button class="btn btn--ghost btn--small" id="clearChat">Clear</button>
+            <button class="btn btn--primary" id="sendBtn">Ask Wile →</button>
+          </div>
         </div>
       </div>
 
-      <div class="chat-input-area">
-        <textarea
-          id="chatInput"
-          placeholder="e.g. Why did Wile set the CDR at 3.2% for Sunrise Mortgage Trust 2021-3?"
-          rows="3"
-        ></textarea>
-        <div class="chat-actions">
-          <button class="btn btn--ghost btn--small" id="clearChat">Clear</button>
-          <button class="btn btn--primary" id="sendBtn">Ask Wile →</button>
+      <!-- TAB 2: New Pool Analysis -->
+      <div class="tab-content tab-content--hidden" id="tabContentNewPool">
+
+        <!-- Step 1: Upload -->
+        <div class="pool-section" id="uploadSection">
+          <p class="pool-section__label">STEP 1 — UPLOAD OFFERING MEMORANDUM</p>
+          <div class="upload-zone" id="uploadZone">
+            <div class="upload-zone__icon">📄</div>
+            <p class="upload-zone__text">Drop a PDF here or click to browse</p>
+            <p class="upload-zone__hint">Supports any RMBS offering memorandum</p>
+            <input type="file" id="pdfFileInput" accept=".pdf" style="display:none" />
+          </div>
+          <div class="upload-status" id="uploadStatus"></div>
         </div>
+
+        <!-- Step 2: Extracted Characteristics -->
+        <div class="pool-section pool-section--hidden" id="extractSection">
+          <p class="pool-section__label">STEP 2 — EXTRACTED POOL CHARACTERISTICS</p>
+          <div class="extract-result" id="extractResult">
+            <!-- populated by JS -->
+          </div>
+          <div class="extract-actions">
+            <button class="btn btn--ghost btn--small" id="reuploadBtn">Upload Different PDF</button>
+            <button class="btn btn--primary" id="askWilePoolBtn">Ask Wile About This Pool →</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Pool Analysis Chat -->
+        <div class="pool-section pool-section--hidden" id="poolChatSection">
+          <p class="pool-section__label">STEP 3 — WILE'S ANALYSIS</p>
+          <div class="chat-window chat-window--pool" id="poolChatWindow">
+          </div>
+          <div class="chat-input-area">
+            <textarea
+              id="poolChatInput"
+              placeholder="Ask a follow-up question about this pool…"
+              rows="2"
+            ></textarea>
+            <div class="chat-actions">
+              <button class="btn btn--ghost btn--small" id="newAnalysisBtn">New Analysis</button>
+              <button class="btn btn--primary" id="poolSendBtn">Send →</button>
+            </div>
+          </div>
+        </div>
+
       </div>
+      <!-- end TAB 2 -->
+
     </aside>
 
   </div>
