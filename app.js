@@ -1,14 +1,14 @@
 // ─── State ───────────────────────────────────────────────────────────────────
 
-let emails        = [];
-let filteredEmails = [];
+let emails          = [];
+let filteredEmails  = [];
 let selectedEmailId = null;
-let apiKey        = '';
-let chatHistory   = [];       // historical lookup chat
-let poolChatHistory = [];     // new pool analysis chat
-let isLoading     = false;
-let extractedPoolData = null; // structured pool data from PDF extraction
-let currentTab    = 'historical';
+let apiKey          = '';
+let chatHistory     = [];
+let poolChatHistory = [];
+let isLoading       = false;
+let extractedPoolData = null;
+let currentTab      = 'historical';
 
 // ─── DOM References ───────────────────────────────────────────────────────────
 
@@ -27,9 +27,10 @@ const pdfFileInput    = document.getElementById('pdfFileInput');
 const uploadZone      = document.getElementById('uploadZone');
 const uploadStatus    = document.getElementById('uploadStatus');
 const uploadSection   = document.getElementById('uploadSection');
-const extractSection  = document.getElementById('extractSection');
+const analysisSection = document.getElementById('analysisSection');
 const extractResult   = document.getElementById('extractResult');
-const poolChatSection = document.getElementById('poolChatSection');
+const poolChatPrompt  = document.getElementById('poolChatPrompt');
+const poolChatActive  = document.getElementById('poolChatActive');
 const poolChatWindow  = document.getElementById('poolChatWindow');
 const poolChatInput   = document.getElementById('poolChatInput');
 const poolSendBtn     = document.getElementById('poolSendBtn');
@@ -59,13 +60,12 @@ async function loadEmails() {
     renderEmailList();
   } catch (err) {
     emailList.innerHTML = `<div style="padding:16px;color:#fca5a5;font-size:12px;">
-      Could not load emails.<br/>Make sure wile_emails.json is in the data/ folder.
-    </div>`;
-    console.error('Failed to load emails:', err);
+      Could not load emails.<br/>Make sure wile_emails.json is in the data/ folder.</div>`;
+    console.error(err);
   }
 }
 
-// ─── Render Email List ───────────────────────────────────────────────────────
+// ─── Email List ───────────────────────────────────────────────────────────────
 
 function renderEmailList() {
   if (filteredEmails.length === 0) {
@@ -74,16 +74,13 @@ function renderEmailList() {
   }
   emailList.innerHTML = filteredEmails.map(email => `
     <div class="email-item ${email.id === selectedEmailId ? 'active' : ''}"
-         data-id="${email.id}"
-         onclick="selectEmail('${email.id}')">
+         data-id="${email.id}" onclick="selectEmail('${email.id}')">
       <div class="email-item__date">${formatDate(email.date)}</div>
       <div class="email-item__subject">${escapeHtml(email.subject)}</div>
       <div class="email-item__preview">${escapeHtml(getPreview(email.body))}</div>
     </div>
   `).join('');
 }
-
-// ─── Select & Display Email ──────────────────────────────────────────────────
 
 function selectEmail(id) {
   selectedEmailId = id;
@@ -100,11 +97,8 @@ function selectEmail(id) {
       ${ccList ? `<div class="email-meta-row"><span class="label">CC</span><span class="value">${escapeHtml(ccList)}</span></div>` : ''}
       <div class="email-meta-row"><span class="label">DATE</span><span class="value">${formatDateLong(email.date)}</span></div>
     </div>
-    <div class="email-detail__body">${escapeHtml(email.body)}</div>
-  `;
+    <div class="email-detail__body">${escapeHtml(email.body)}</div>`;
 }
-
-// ─── Search ──────────────────────────────────────────────────────────────────
 
 emailSearch.addEventListener('input', () => {
   const query = emailSearch.value.toLowerCase().trim();
@@ -134,7 +128,6 @@ apiKeySave.addEventListener('click', () => {
 // ─── Historical Lookup Chat ───────────────────────────────────────────────────
 
 sendBtn.addEventListener('click', sendMessage);
-
 chatInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 });
@@ -160,7 +153,6 @@ async function sendMessage() {
   isLoading = true;
   sendBtn.disabled = true;
 
-  const emailContext = buildEmailContext();
   const systemPrompt = `You are an AI persona representing Wile Coyote, a retired Senior Portfolio Manager at Acme Asset Management who spent 18+ years structuring Collateralized Loan Obligations (CLOs). You have been given access to Wile's complete email archive.
 
 Your role is to answer questions by reasoning over his emails and reconstructing his thinking. When answering:
@@ -173,10 +165,9 @@ Your role is to answer questions by reasoning over his emails and reconstructing
 
 Here is Wile Coyote's complete email archive:
 
-${emailContext}`;
+${buildEmailContext()}`;
 
   chatHistory.push({ role: 'user', content: question });
-
   try {
     const reply = await callClaude(systemPrompt, chatHistory);
     removeLoadingIndicator(loadingId);
@@ -202,9 +193,7 @@ uploadZone.addEventListener('dragover', (e) => {
   uploadZone.classList.add('upload-zone--drag');
 });
 
-uploadZone.addEventListener('dragleave', () => {
-  uploadZone.classList.remove('upload-zone--drag');
-});
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('upload-zone--drag'));
 
 uploadZone.addEventListener('drop', (e) => {
   e.preventDefault();
@@ -215,12 +204,11 @@ uploadZone.addEventListener('drop', (e) => {
 });
 
 pdfFileInput.addEventListener('change', () => {
-  const file = pdfFileInput.files[0];
-  if (file) handlePdfUpload(file);
+  if (pdfFileInput.files[0]) handlePdfUpload(pdfFileInput.files[0]);
 });
 
 reuploadBtn.addEventListener('click', resetToUpload);
-newAnalysisBtn.addEventListener('click', resetToUpload);
+newAnalysisBtn.addEventListener('click', resetAnalysis);
 
 function resetToUpload() {
   extractedPoolData = null;
@@ -228,7 +216,17 @@ function resetToUpload() {
   poolChatWindow.innerHTML = '';
   pdfFileInput.value = '';
   setUploadStatus('', '');
-  showSection('upload');
+  // Show upload section, hide analysis section
+  uploadSection.classList.remove('pool-section--hidden');
+  analysisSection.classList.add('pool-section--hidden');
+}
+
+function resetAnalysis() {
+  // Keep the characteristics visible, just reset the chat
+  poolChatHistory = [];
+  poolChatWindow.innerHTML = '';
+  poolChatActive.classList.add('pool-section--hidden');
+  poolChatPrompt.classList.remove('pool-section--hidden');
 }
 
 async function handlePdfUpload(file) {
@@ -236,16 +234,16 @@ async function handlePdfUpload(file) {
     setUploadStatus('Please save your API key before uploading.', 'error');
     return;
   }
-
   setUploadStatus(`Reading ${file.name}…`, 'loading');
-
   try {
     const base64 = await fileToBase64(file);
     setUploadStatus('Extracting pool characteristics…', 'loading');
     const extracted = await extractPoolData(base64);
     extractedPoolData = extracted;
     renderExtractedData(extracted);
-    showSection('extract');
+    // Show analysis section, hide upload section
+    uploadSection.classList.add('pool-section--hidden');
+    analysisSection.classList.remove('pool-section--hidden');
     setUploadStatus('', '');
   } catch (err) {
     setUploadStatus(`Error: ${err.message}`, 'error');
@@ -297,14 +295,7 @@ Return this exact structure (use null for any field not found):
       messages: [{
         role: 'user',
         content: [
-          {
-            type: 'document',
-            source: {
-              type: 'base64',
-              media_type: 'application/pdf',
-              data: base64Pdf
-            }
-          },
+          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64Pdf } },
           { type: 'text', text: extractPrompt }
         ]
       }]
@@ -318,14 +309,12 @@ Return this exact structure (use null for any field not found):
 
   const data = await response.json();
   const raw = data.content.map(b => b.text || '').join('').trim();
-
-  // Strip markdown fences if present
   const clean = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
   return JSON.parse(clean);
 }
 
 function renderExtractedData(d) {
-  const field = (label, value) => value && value !== 'null' ? `
+  const field = (label, value) => (value && value !== 'null' && value !== 'None') ? `
     <div class="extract-row">
       <span class="extract-label">${label}</span>
       <span class="extract-value">${escapeHtml(String(value))}</span>
@@ -335,22 +324,22 @@ function renderExtractedData(d) {
     <div class="extract-deal-name">${escapeHtml(d.deal_name || 'Unnamed Deal')}</div>
     <div class="extract-grid">
       ${field('Pool Balance', d.pool_balance)}
-      ${field('Number of Loans', d.num_loans)}
+      ${field('No. of Loans', d.num_loans)}
       ${field('Avg Loan Balance', d.avg_loan_balance)}
       ${field('WA LTV', d.wa_ltv)}
       ${field('WA FICO', d.wa_fico)}
       ${field('WA DTI', d.wa_dti)}
       ${field('WA Coupon', d.wa_coupon)}
       ${field('WA Seasoning', d.wa_seasoning)}
-      ${field('WA Remaining Term', d.wa_remaining_term)}
+      ${field('WA Rem. Term', d.wa_remaining_term)}
       ${field('% Fixed Rate', d.pct_fixed)}
-      ${field('% Owner Occupied', d.pct_owner_occ)}
-      ${field('% Judicial States', d.pct_judicial)}
-      ${field('Geographic HHI', d.hhi)}
+      ${field('% Owner Occ.', d.pct_owner_occ)}
+      ${field('% Judicial', d.pct_judicial)}
+      ${field('HHI', d.hhi)}
+      ${field('Senior CE', d.senior_ce)}
       ${field('Largest State', d.largest_state ? `${d.largest_state} (${d.largest_state_pct})` : null)}
       ${field('2nd State', d.second_state ? `${d.second_state} (${d.second_state_pct})` : null)}
       ${field('3rd State', d.third_state ? `${d.third_state} (${d.third_state_pct})` : null)}
-      ${field('Senior CE', d.senior_ce)}
       ${field('Pricing Date', d.pricing_date)}
     </div>
     ${d.key_risks ? `<div class="extract-risks"><span class="extract-label">Key Risks</span><p>${escapeHtml(d.key_risks)}</p></div>` : ''}
@@ -361,12 +350,12 @@ function renderExtractedData(d) {
 
 askWilePoolBtn.addEventListener('click', () => {
   if (!extractedPoolData) return;
-  showSection('poolchat');
+  poolChatPrompt.classList.add('pool-section--hidden');
+  poolChatActive.classList.remove('pool-section--hidden');
   startPoolAnalysis();
 });
 
 poolSendBtn.addEventListener('click', sendPoolMessage);
-
 poolChatInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendPoolMessage(); }
 });
@@ -380,11 +369,9 @@ async function startPoolAnalysis() {
   isLoading = true;
   poolSendBtn.disabled = true;
 
-  const systemPrompt = buildPoolSystemPrompt();
   poolChatHistory = [{ role: 'user', content: question }];
-
   try {
-    const reply = await callClaude(systemPrompt, poolChatHistory);
+    const reply = await callClaude(buildPoolSystemPrompt(), poolChatHistory);
     removeLoadingIndicator(loadingId);
     poolChatHistory.push({ role: 'assistant', content: reply });
     appendMessage(poolChatWindow, 'assistant', 'Wile (AI Persona)', reply);
@@ -410,7 +397,6 @@ async function sendPoolMessage() {
   poolSendBtn.disabled = true;
 
   poolChatHistory.push({ role: 'user', content: question });
-
   try {
     const reply = await callClaude(buildPoolSystemPrompt(), poolChatHistory);
     removeLoadingIndicator(loadingId);
@@ -428,21 +414,20 @@ async function sendPoolMessage() {
 }
 
 function buildPoolSystemPrompt() {
-  const emailContext = buildEmailContext();
   return `You are an AI persona representing Wile Coyote, a retired Senior Portfolio Manager at Acme Asset Management who spent 18+ years structuring CLOs and mortgage-backed securities.
 
-You are being asked to apply Wile's analytical framework to a NEW mortgage pool that he never analyzed. Your job is to reason as Wile would have — using his documented CDR calibration methodology, geographic concentration overlays, seasoning adjustments, and state-specific penalties — and provide a CDR recommendation for the new pool.
+You are being asked to apply Wile's analytical framework to a NEW mortgage pool. Your job is to reason as Wile would have — using his documented CDR calibration methodology, geographic concentration overlays, seasoning adjustments, and state-specific penalties — and provide a CDR recommendation for the new pool.
 
 When answering:
 - Walk through Wile's framework step by step: base CDR from the LTV/FICO grid, then each adjustment overlay with its rationale
-- Reference how Wile handled similar characteristics in past deals (drawing on his email archive below)
+- Reference how Wile handled similar characteristics in past deals, drawing on his email archive
 - Be specific about basis point adjustments and their rationale
 - Conclude with a recommended base CDR and brief stress case comment
-- Speak as if Wile is the analyst providing the recommendation: "Based on Wile's framework..." or "Wile would have applied..."
+- Speak in the third person: "Based on Wile's framework..." or "Wile would have applied..."
 
 Here is Wile Coyote's complete email archive for reference:
 
-${emailContext}`;
+${buildEmailContext()}`;
 }
 
 function buildPoolSummary(d) {
@@ -479,7 +464,7 @@ async function callClaude(systemPrompt, messages) {
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1024,
       system: systemPrompt,
-      messages: messages
+      messages
     })
   });
 
@@ -492,19 +477,6 @@ async function callClaude(systemPrompt, messages) {
   return data.content.map(b => b.text || '').join('');
 }
 
-// ─── Section Visibility ───────────────────────────────────────────────────────
-
-function showSection(section) {
-  uploadSection.classList.toggle('pool-section--hidden',  section !== 'upload');
-  extractSection.classList.toggle('pool-section--hidden', section !== 'extract');
-  poolChatSection.classList.toggle('pool-section--hidden', section !== 'poolchat');
-}
-
-function setUploadStatus(msg, type) {
-  uploadStatus.textContent = msg;
-  uploadStatus.className = 'upload-status' + (type ? ` upload-status--${type}` : '');
-}
-
 // ─── Chat Helpers ─────────────────────────────────────────────────────────────
 
 function appendMessage(container, type, role, text) {
@@ -512,8 +484,7 @@ function appendMessage(container, type, role, text) {
   div.className = `chat-message chat-message--${type}`;
   div.innerHTML = `
     ${role ? `<div class="chat-message__role">${escapeHtml(role)}</div>` : ''}
-    <div class="chat-message__bubble">${escapeHtml(text)}</div>
-  `;
+    <div class="chat-message__bubble">${escapeHtml(text)}</div>`;
   container.appendChild(div);
   container.scrollTop = container.scrollHeight;
   return div;
@@ -528,8 +499,7 @@ function appendLoadingIndicator(container) {
     <div class="chat-message__role" style="color:var(--mit-red)">WILE (AI PERSONA)</div>
     <div class="chat-message__bubble">
       <div class="typing-dots"><span></span><span></span><span></span></div>
-    </div>
-  `;
+    </div>`;
   container.appendChild(div);
   container.scrollTop = container.scrollHeight;
   return id;
@@ -551,7 +521,7 @@ function buildEmailContext() {
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onload  = () => resolve(reader.result.split(',')[1]);
     reader.onerror = () => reject(new Error('Failed to read file'));
     reader.readAsDataURL(file);
   });
@@ -559,10 +529,8 @@ function fileToBase64(file) {
 
 function escapeHtml(str) {
   return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function getPreview(body) {
@@ -570,13 +538,13 @@ function getPreview(body) {
 }
 
 function formatDate(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US',
+    { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 function formatDateLong(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US',
+    { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────────

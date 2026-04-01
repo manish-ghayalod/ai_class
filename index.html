@@ -67,7 +67,7 @@
         </button>
       </div>
 
-      <!-- TAB 1: Historical Lookup (chat) -->
+      <!-- TAB 1: Historical Lookup -->
       <div class="tab-content" id="tabContentHistorical">
         <div class="chat-window" id="chatWindow">
           <div class="chat-message chat-message--system">
@@ -93,7 +93,7 @@
       <!-- TAB 2: New Pool Analysis -->
       <div class="tab-content tab-content--hidden" id="tabContentNewPool">
 
-        <!-- Step 1: Upload -->
+        <!-- STEP 1: Upload (shown when no PDF loaded) -->
         <div class="pool-section" id="uploadSection">
           <p class="pool-section__label">STEP 1 — UPLOAD OFFERING MEMORANDUM</p>
           <div class="upload-zone" id="uploadZone">
@@ -105,35 +105,52 @@
           <div class="upload-status" id="uploadStatus"></div>
         </div>
 
-        <!-- Step 2: Extracted Characteristics -->
-        <div class="pool-section pool-section--hidden" id="extractSection">
-          <p class="pool-section__label">STEP 2 — EXTRACTED POOL CHARACTERISTICS</p>
-          <div class="extract-result" id="extractResult">
-            <!-- populated by JS -->
-          </div>
-          <div class="extract-actions">
-            <button class="btn btn--ghost btn--small" id="reuploadBtn">Upload Different PDF</button>
-            <button class="btn btn--primary" id="askWilePoolBtn">Ask Wile About This Pool →</button>
-          </div>
-        </div>
+        <!-- STEPS 2+3: Persistent characteristics + chat (shown after PDF loaded) -->
+        <div class="pool-section pool-section--hidden pool-section--analysis" id="analysisSection">
 
-        <!-- Step 3: Pool Analysis Chat -->
-        <div class="pool-section pool-section--hidden" id="poolChatSection">
-          <p class="pool-section__label">STEP 3 — WILE'S ANALYSIS</p>
-          <div class="chat-window chat-window--pool" id="poolChatWindow">
-          </div>
-          <div class="chat-input-area">
-            <textarea
-              id="poolChatInput"
-              placeholder="Ask a follow-up question about this pool…"
-              rows="2"
-            ></textarea>
-            <div class="chat-actions">
-              <button class="btn btn--ghost btn--small" id="newAnalysisBtn">New Analysis</button>
-              <button class="btn btn--primary" id="poolSendBtn">Send →</button>
+          <!-- Persistent pool characteristics (always visible once extracted) -->
+          <div class="pool-characteristics" id="poolCharacteristics">
+            <div class="pool-characteristics__header">
+              <span class="pool-section__label">POOL CHARACTERISTICS</span>
+              <button class="btn btn--ghost btn--small" id="reuploadBtn">Upload New PDF</button>
+            </div>
+            <div class="extract-result" id="extractResult">
+              <!-- populated by JS -->
             </div>
           </div>
+
+          <!-- Divider -->
+          <div class="analysis-divider"></div>
+
+          <!-- Chat area (shown after "Ask Wile" is clicked) -->
+          <div class="pool-chat-area" id="poolChatArea">
+            <!-- Initial state: just the Ask Wile button -->
+            <div class="pool-chat-prompt" id="poolChatPrompt">
+              <button class="btn btn--primary btn--full" id="askWilePoolBtn">
+                Ask Wile About This Pool →
+              </button>
+            </div>
+
+            <!-- Active chat -->
+            <div class="pool-chat-active pool-section--hidden" id="poolChatActive">
+              <p class="pool-section__label">WILE'S ANALYSIS</p>
+              <div class="chat-window chat-window--pool" id="poolChatWindow"></div>
+              <div class="chat-input-area" style="padding:0;border-top:none;">
+                <textarea
+                  id="poolChatInput"
+                  placeholder="Ask a follow-up question about this pool…"
+                  rows="2"
+                ></textarea>
+                <div class="chat-actions">
+                  <button class="btn btn--ghost btn--small" id="newAnalysisBtn">New Analysis</button>
+                  <button class="btn btn--primary" id="poolSendBtn">Send →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
+        <!-- end analysisSection -->
 
       </div>
       <!-- end TAB 2 -->
