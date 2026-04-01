@@ -747,3 +747,63 @@ html, body {
 /* ─── Utility ──────────────────────────────────────────────────────────── */
 .hidden { display: none !important; }
 
+
+/* ─── Layout Fixes for Analysis Section ────────────────────────────────── */
+
+/* Make the new pool tab content fill height correctly */
+#tabContentNewPool {
+  min-height: 0;
+}
+
+/* Analysis section fills remaining space and scrolls internally */
+#analysisSection {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Characteristics panel: fixed portion at top */
+.pool-characteristics {
+  flex-shrink: 0;
+  max-height: 220px;
+  min-height: 120px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.pool-characteristics .extract-result {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* Chat area fills the rest */
+#poolChatArea {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 12px 16px;
+  gap: 10px;
+}
+
+/* Pool chat active fills its container */
+#poolChatActive {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+
+/* Chat window inside pool analysis takes all available space */
+#poolChatWindow {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
