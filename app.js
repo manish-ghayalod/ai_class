@@ -210,6 +210,11 @@ pdfFileInput.addEventListener('change', () => {
 reuploadBtn.addEventListener('click', resetToUpload);
 newAnalysisBtn.addEventListener('click', resetAnalysis);
 
+function setUploadStatus(msg, type) {
+  uploadStatus.textContent = msg;
+  uploadStatus.className = 'upload-status' + (type ? ` upload-status--${type}` : '');
+}
+
 function resetToUpload() {
   extractedPoolData = null;
   poolChatHistory = [];
