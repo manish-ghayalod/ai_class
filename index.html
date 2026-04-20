@@ -159,6 +159,21 @@
 
   </div>
 
+  <nav class="mobile-nav" id="mobileNav">
+    <button class="mobile-nav__btn mobile-nav__btn--active" id="mobileNavEmails" onclick="switchMobilePanel('left')">
+      <span class="mobile-nav__icon">✉</span>
+      <span class="mobile-nav__label">Emails</span>
+    </button>
+    <button class="mobile-nav__btn" id="mobileNavRead" onclick="switchMobilePanel('center')">
+      <span class="mobile-nav__icon">📄</span>
+      <span class="mobile-nav__label">Read</span>
+    </button>
+    <button class="mobile-nav__btn" id="mobileNavAsk" onclick="switchMobilePanel('right')">
+      <span class="mobile-nav__icon">💬</span>
+      <span class="mobile-nav__label">Ask Wile</span>
+    </button>
+  </nav>
+
   <script src="app.js"></script>
 </body>
 </html>

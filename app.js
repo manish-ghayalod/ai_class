@@ -87,6 +87,7 @@ function selectEmail(id) {
   const email = emails.find(e => e.id === id);
   if (!email) return;
   renderEmailList();
+  if (isMobile()) switchMobilePanel('center');
   const toList = Array.isArray(email.to) ? email.to.join(', ') : email.to;
   const ccList = email.cc && email.cc.length > 0 ? email.cc.join(', ') : null;
   emailDetail.innerHTML = `
@@ -550,6 +551,26 @@ function formatDateLong(dateStr) {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US',
     { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 }
+
+// ─── Mobile Panel Switching ───────────────────────────────────────────────────
+
+const mobilePanels = {
+  left:   { el: document.querySelector('.panel--left'),   btn: document.getElementById('mobileNavEmails') },
+  center: { el: document.querySelector('.panel--center'), btn: document.getElementById('mobileNavRead') },
+  right:  { el: document.querySelector('.panel--right'),  btn: document.getElementById('mobileNavAsk') },
+};
+
+function isMobile() { return window.innerWidth <= 768; }
+
+function switchMobilePanel(key) {
+  if (!isMobile()) return;
+  Object.entries(mobilePanels).forEach(([k, { el, btn }]) => {
+    el.classList.toggle('mobile-active', k === key);
+    btn.classList.toggle('mobile-nav__btn--active', k === key);
+  });
+}
+
+if (isMobile()) switchMobilePanel('left');
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 
