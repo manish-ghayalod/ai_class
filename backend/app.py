@@ -73,7 +73,7 @@ def chat_historical():
     try:
         client = anthropic.Anthropic(api_key=api_key)
         response = client.messages.create(
-            model='claude-sonnet-4-20250514',
+            model='claude-sonnet-4-6',
             max_tokens=1024,
             system=historical_system_prompt(),
             messages=messages,
@@ -93,7 +93,7 @@ def chat_pool():
     try:
         client = anthropic.Anthropic(api_key=api_key)
         response = client.messages.create(
-            model='claude-sonnet-4-20250514',
+            model='claude-sonnet-4-6',
             max_tokens=1024,
             system=pool_system_prompt(),
             messages=messages,
@@ -143,7 +143,7 @@ Return this exact structure (use null for any field not found):
     try:
         client = anthropic.Anthropic(api_key=api_key)
         response = client.messages.create(
-            model='claude-sonnet-4-20250514',
+            model='claude-sonnet-4-6',
             max_tokens=1024,
             messages=[{
                 'role': 'user',
